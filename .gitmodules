@@ -1,0 +1,12 @@
+[submodule "Calulix-MT/app/ccx-shape"]
+	path = Calulix-MT/app/ccx-shape
+	url = https://github.com/fandaL/ccx-shape.git
+[submodule "Calculix-MT/app/ccx-shape"]
+	path = Calculix-MT/app/ccx-shape
+	url = https://github.com/fandaL/ccx-shape.git
+[submodule "Calculix-MT/app/beso"]
+	path = Calculix-MT/app/beso
+	url = https://github.com/fandaL/beso.git
+[submodule "Calculix-MT/app/ToOptiX"]
+	path = Calculix-MT/app/ToOptiX
+	url = https://github.com/DuAlexander/ToOptiX.git
