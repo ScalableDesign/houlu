@@ -4,12 +4,9 @@
 # Laurent ESCALIER <laurent.escalier@scalable-design.com>
 
 # Use intel python for increased performance
-FROM intelpython3_full:latest
+FROM intelpython/intelpython3_core:latest
 LABEL maintainer "Scalable Design <contact@scalable-design.com>"
 LABEL version "1.0"
-
-USER root
-WORKDIR /tmp
 
 ENV DEV_PACKAGES="\
     gfortran \
@@ -20,28 +17,48 @@ ENV DEV_PACKAGES="\
     libopenmpi-dev \
     curl \
     "
-
 USER root
-WORKDIR /tmp
+WORKDIR /opt
+
+# Install recommanded packages
+RUN apt-get update && \
+    apt-get install -y build-essential apt-utils
 
 # Install recommanded packages
 RUN apt-get update && \
     apt-get install -y --no-install-recommends $DEV_PACKAGES
 
-COPY ./install_calculix.pl /tmp/
-RUN perl /tmp/install_calculix.pl
-RUN cp /tmp/ccx_2.15_MT /bin/ccx_2.15_MT
-RUN ln -s /bin/ccx_2.15_MT /bin/ccx
+# Install Calculix
+COPY ./install_calculix.pl /opt/
+RUN perl /opt/install_calculix.pl && \
+    cp /opt/ccx_2.15_MT /bin/ccx_2.15_MT && \
+    ln -s /bin/ccx_2.15_MT /bin/ccx
 
+# Install pycalculix
+RUN pip install --upgrade pip && \
+    pip install pycalculix
+
+# Perform cleanup 
+RUN rm -rf /var/lib/apt/lists/* && \
+    apt-get autoclean && \
+    rm /opt/Makefile && \
+    rm /opt/install_calculix.pl
 
 ########################################################
 # Customization for user
 ########################################################
-RUN groupadd -g 61000 simgroup 
-RUN useradd -g 61000 -l -m -s /bin/bash -u 61000 simuser
-USER simuser
-ENV DOCKER_HOME /home/simuser
+RUN useradd -ms /bin/bash  ccxuser
+ENV DOCKER_HOME /home/ccxuser
 WORKDIR $DOCKER_HOME
 
-RUN echo "export OMP_NUM_THREADS=\$(nproc)" >> $DOCKER_HOME/.profile && \
+COPY ./run_ccx.sh .
+RUN chmod a+x run_ccx.sh && \
     chown -R $DOCKER_USER:$DOCKER_GROUP $DOCKER_HOME
+    
+########################################################
+# APP Tools
+########################################################
+COPY ./app/* /app/
+
+USER ccxuser
+CMD ["/bin/bash"]

@@ -1,0 +1,5 @@
+git
+bash
+supervisor
+nodejs
+nodejs-npm
