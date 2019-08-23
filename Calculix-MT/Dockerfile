@@ -34,16 +34,16 @@ RUN perl /opt/install_calculix.pl && \
     cp /opt/ccx_2.15_MT /bin/ccx_2.15_MT && \
     ln -s /bin/ccx_2.15_MT /bin/ccx
 
-# Install pycalculix
-RUN pip install --upgrade pip && \
-    pip install pycalculix
-
 # Perform cleanup 
 RUN rm -rf /var/lib/apt/lists/* && \
     apt-get autoclean && \
     rm /opt/Makefile && \
     rm /opt/install_calculix.pl
 
+# Install pycalculix
+RUN pip install --upgrade pip && \
+    pip install pycalculix
+    
 ########################################################
 # Customization for user
 ########################################################
